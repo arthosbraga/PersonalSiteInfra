@@ -21,7 +21,7 @@ jobs:
           version: "latest"
 
       - name: Configure Kubeconfig
-        shell: pwsh
+        shell: powershell
         env:
           KUBECONFIG_DATA: ${{ secrets.KUBECONFIG }}
         run: |
@@ -39,7 +39,7 @@ jobs:
           }
 
       - name: Deploy Manifests
-        shell: pwsh
+        shell: powershell
         run: |
           kubectl apply -f kubernetes/namespaces.yaml
 
