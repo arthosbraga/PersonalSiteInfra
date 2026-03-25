@@ -47,25 +47,25 @@ spec:
       volumes:
         - name: programdata
           hostPath:
-            path: /c/DEV/arthos.dev.br/Emby/programdata
+            path: /host_mnt/c/DEV/arthos.dev.br/Emby/programdata
         - name: data
           hostPath:
-            path: /c/DEV/arthos.dev.br/Emby/data
+            path: /host_mnt/c/DEV/arthos.dev.br/Emby/data
         - name: animes
           hostPath:
-            path: /e/Animes
+            path: /host_mnt/e/Animes
         - name: filmes2
           hostPath:
-            path: /e/Filmes
+            path: /host_mnt/e/Filmes
         - name: series2
           hostPath:
-            path: /e/Series
+            path: /host_mnt/e/Series
         - name: filmes
           hostPath:
-            path: /f/Filmes
+            path: /host_mnt/f/Filmes
         - name: series
           hostPath:
-            path: /f/Series
+            path: /host_mnt/f/Series
 ---
 apiVersion: v1
 kind: Service
