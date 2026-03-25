@@ -34,7 +34,7 @@ spec:
               service:
                 name: emby-svc
                 port:
-                  number: 443
+                  number: 80
     - host: priscilacatarino.com.br
       http:
         paths:
