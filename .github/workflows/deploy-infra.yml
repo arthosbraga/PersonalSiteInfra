@@ -21,32 +21,36 @@ jobs:
           version: "latest"
 
       - name: Configure Kubeconfig
-        shell: bash
+        shell: pwsh
         env:
           KUBECONFIG_DATA: ${{ secrets.KUBECONFIG }}
         run: |
-          # Salvando o config na pasta temporária do GitHub Runner
-          # ATENÇÃO: Se os certificados do secret estiverem vazios (como "") o kubectl não conectará.
-          echo "$KUBECONFIG_DATA" > "${RUNNER_TEMP}/kubeconfig"
-          echo "KUBECONFIG=${RUNNER_TEMP}/kubeconfig" >> $GITHUB_ENV
+          $tempKubeconfig = Join-Path $env:RUNNER_TEMP "kubeconfig"
+          $env:KUBECONFIG_DATA | Out-File -FilePath $tempKubeconfig -Encoding utf8
+          Add-Content -Path $env:GITHUB_ENV -Value "KUBECONFIG=$tempKubeconfig"
 
-          if [ ! -s "${RUNNER_TEMP}/kubeconfig" ] || ! grep -q "apiVersion:" "${RUNNER_TEMP}/kubeconfig"; then
-            echo "ERRO FATAL: O Secret KUBECONFIG não foi encontrado ou está vazio."
+          $configContent = ""
+          if (Test-Path $tempKubeconfig) {
+            $configContent = Get-Content -Path $tempKubeconfig -Raw
+          }
+          if ([string]::IsNullOrWhiteSpace($configContent) -or $configContent -notmatch "apiVersion:") {
+            Write-Host "ERRO FATAL: O Secret KUBECONFIG não foi encontrado ou está vazio."
             exit 1
-          fi
+          }
 
       - name: Deploy Manifests
+        shell: pwsh
         run: |
           kubectl apply -f kubernetes/namespaces.yaml
 
           # Inject Secrets dynamically using GitHub Repository Secrets
-          kubectl create secret generic personal-infra-secrets \
-            --namespace personal-infra \
-            --from-literal=HF_TOKEN="${{ secrets.HF_TOKEN }}" \
-            --from-literal=CLOUDFLARE_API_TOKEN="${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-            --from-literal=PIHOLE_WEBPASSWORD="${{ secrets.PIHOLE_WEBPASSWORD }}" \
-            --from-literal=POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
-            --from-literal=OPENSEARCH_PASSWORD="${{ secrets.OPENSEARCH_PASSWORD }}" \
+          kubectl create secret generic personal-infra-secrets `
+            --namespace personal-infra `
+            --from-literal=HF_TOKEN="${{ secrets.HF_TOKEN }}" `
+            --from-literal=CLOUDFLARE_API_TOKEN="${{ secrets.CLOUDFLARE_API_TOKEN }}" `
+            --from-literal=PIHOLE_WEBPASSWORD="${{ secrets.PIHOLE_WEBPASSWORD }}" `
+            --from-literal=POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" `
+            --from-literal=OPENSEARCH_PASSWORD="${{ secrets.OPENSEARCH_PASSWORD }}" `
             --dry-run=client -o yaml | kubectl apply -f -
             
           kubectl apply -f kubernetes/storage/
