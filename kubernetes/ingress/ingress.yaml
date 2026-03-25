@@ -14,14 +14,8 @@ spec:
         - flix.arthos.dev.br
         - priscilacatarino.com.br
         - arthos.dev.br
-        - drive.arthos.dev.br
         - searchnode.arthos.dev.br
         - search.arthos.dev.br
-        - vnc.arthos.dev.br
-        - ragmcp.arthos.dev.br
-        - api-backstage.arthos.dev.br
-        - stream.arthos.dev.br
-        - backstage.arthos.dev.br
       secretName: personal-infra-tls
   rules:
     # Route definitions will point to their respective services
@@ -55,16 +49,7 @@ spec:
                 name: pihole-svc
                 port:
                   number: 80
-    - host: drive.arthos.dev.br
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: nextcloud-svc
-                port:
-                  number: 80
+
     - host: searchnode.arthos.dev.br
       http:
         paths:
@@ -85,53 +70,3 @@ spec:
                 name: opensearch-dashboards-svc
                 port:
                   number: 5601
-    - host: vnc.arthos.dev.br
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: windows-svc
-                port:
-                  number: 8006
-    - host: ragmcp.arthos.dev.br
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: rag-mcp-svc
-                port:
-                  number: 8000
-    - host: backstage.arthos.dev.br
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: backstage-ui-svc
-                port:
-                  number: 4200
-    - host: api-backstage.arthos.dev.br
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: rtmp-backstage-svc
-                port:
-                  number: 80
-    - host: stream.arthos.dev.br
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: rtmp-backstage-svc
-                port:
-                  number: 80
