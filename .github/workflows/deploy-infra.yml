@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'kubernetes/**'
+      - "kubernetes/**"
 
 jobs:
   deploy:
@@ -17,14 +17,15 @@ jobs:
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
-          version: 'latest'
+          version: "latest"
 
       - name: Configure Kubeconfig
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
-          
+
+
           # Sobrescreve a URL do server no kubeconfig para acessar via VPN (porta nativa K8s: 6443)
           # --minify garante que ele pegue apenas o cluster do contexto atual
           CLUSTER_NAME=$(kubectl config view --minify -o jsonpath='{.clusters[0].name}')
@@ -37,7 +38,7 @@ jobs:
       - name: Deploy Manifests
         run: |
           kubectl apply -f kubernetes/namespaces.yaml
-          
+
           # Inject Secrets dynamically using GitHub Repository Secrets
           kubectl create secret generic personal-infra-secrets \
             --namespace personal-infra \
