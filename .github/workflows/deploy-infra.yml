@@ -25,8 +25,15 @@ jobs:
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
-
-
+          
+          if [ ! -s ~/.kube/config ] || ! grep -q "apiVersion:" ~/.kube/config; then
+            echo "=========================================================================="
+            echo "ERRO FATAL: O Secret KUBECONFIG não foi encontrado ou está vazio."
+            echo "Você precisa ir nas configurações do repositório no GitHub:"
+            echo "Settings -> Secrets and variables -> Actions e criar o Secret KUBECONFIG."
+            echo "=========================================================================="
+            exit 1
+          fi
           # Sobrescreve a URL do server no kubeconfig para acessar via VPN (porta nativa K8s: 6443)
           # --minify garante que ele pegue apenas o cluster do contexto atual
           CLUSTER_NAME=$(kubectl config view --minify -o jsonpath='{.clusters[0].name}')
