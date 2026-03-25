@@ -26,9 +26,9 @@ spec:
         ports:
         - containerPort: 8096
         - containerPort: 8920
-        resources:
-          limits:
-            nvidia.com/gpu: 1
+        # resources:
+        #   limits:
+        #     nvidia.com/gpu: "1"
         volumeMounts:
         - name: programdata
           mountPath: /config
