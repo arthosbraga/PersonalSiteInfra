@@ -41,7 +41,7 @@ jobs:
             echo "Erro: O nome do cluster não foi encontrado. O secret KUBECONFIG está configurado corretamente?"
             exit 1
           fi
-          kubectl config set-cluster "$CLUSTER_NAME" --server=https://vpn.arthos.dev.br:6443 --insecure-skip-tls-verify=true
+          kubectl config set-cluster "$CLUSTER_NAME" --server=http://vpn.arthos.dev.br:6443 --insecure-skip-tls-verify=true
 
       - name: Deploy Manifests
         run: |
