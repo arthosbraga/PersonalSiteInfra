@@ -14,10 +14,10 @@ spec:
         app: priscilacatarinopsi
     spec:
       imagePullSecrets:
-        - name: ghcr-login-secret
+        - name: ghcr-login-secret-priscila
       containers:
         - name: web
-          image: priscilacatarinocom:latest
+          image: ghcr.io/pitykohwalter/priscilacatarinocom:latest
           ports:
             - containerPort: 80
           env:

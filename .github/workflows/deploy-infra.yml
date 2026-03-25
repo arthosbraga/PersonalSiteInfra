@@ -52,7 +52,17 @@ jobs:
             --namespace personal-infra `
             --docker-server=ghcr.io `
             --docker-username=${{ github.actor }} `
-            --docker-password="${{ secrets.GITHUB_TOKEN }}" `
+            --docker-password=${{ secrets.GHCR_PAT }} `
+            --docker-email=${{ github.actor }}@users.noreply.github.com `
+            --dry-run=client -o yaml | kubectl apply -f -
+            
+          # Inject GHCR Pull Secret for Priscila's Account (pitykohwalter)
+          kubectl create secret docker-registry ghcr-login-secret-priscila `
+            --namespace personal-infra `
+            --docker-server=ghcr.io `
+            --docker-username=pitykohwalter `
+            --docker-password=${{ secrets.GHCR_PAT_PRISCILA }} `
+            --docker-email=pitykohwalter@users.noreply.github.com `
             --dry-run=client -o yaml | kubectl apply -f -
 
           # Inject Secrets dynamically using GitHub Repository Secrets
