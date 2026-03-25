@@ -13,15 +13,14 @@ spec:
       labels:
         app: rtmp-backstage
     spec:
+      imagePullSecrets:
+      - name: ghcr-login-secret
       containers:
       - name: rtmp-backstage
         image: ghcr.io/arthosbraga/rtmp-backstage:latest
         ports:
         - containerPort: 1935
         - containerPort: 80
-        resources:
-          limits:
-            nvidia.com/gpu: 1
         volumeMounts:
         - name: data
           mountPath: /data
@@ -62,6 +61,8 @@ spec:
       labels:
         app: backstage-ui
     spec:
+      imagePullSecrets:
+      - name: ghcr-login-secret
       containers:
       - name: backstage-ui
         image: ghcr.io/arthosbraga/backstage-ui:latest

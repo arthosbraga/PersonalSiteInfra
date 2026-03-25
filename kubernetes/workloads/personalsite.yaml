@@ -13,6 +13,8 @@ spec:
       labels:
         app: personalsite-front
     spec:
+      imagePullSecrets:
+      - name: ghcr-login-secret
       containers:
       - name: frontend
         image: ghcr.io/arthosbraga/personalsite-front:latest
@@ -47,6 +49,8 @@ spec:
       labels:
         app: personalsite-back
     spec:
+      imagePullSecrets:
+      - name: ghcr-login-secret
       containers:
       - name: backend
         image: ghcr.io/arthosbraga/personalsite-back:latest

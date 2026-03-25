@@ -43,6 +43,14 @@ jobs:
         run: |
           kubectl apply -f kubernetes/namespaces.yaml
 
+          # Inject GHCR Pull Secret
+          kubectl create secret docker-registry ghcr-login-secret `
+            --namespace personal-infra `
+            --docker-server=ghcr.io `
+            --docker-username=${{ github.actor }} `
+            --docker-password="${{ secrets.GITHUB_TOKEN }}" `
+            --dry-run=client -o yaml | kubectl apply -f -
+
           # Inject Secrets dynamically using GitHub Repository Secrets
           kubectl create secret generic personal-infra-secrets `
             --namespace personal-infra `
