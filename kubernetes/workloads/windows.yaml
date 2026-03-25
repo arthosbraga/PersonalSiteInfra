@@ -4,7 +4,7 @@ metadata:
   name: windows
   namespace: personal-infra
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: windows
@@ -45,7 +45,7 @@ spec:
         - containerPort: 9200
         resources:
           limits:
-            nvidia.com/gpu: 1
+            nvidia.com/gpu: "1"
         volumeMounts:
         - name: dev
           mountPath: /dev/kvm

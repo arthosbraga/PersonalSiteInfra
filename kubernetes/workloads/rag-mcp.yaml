@@ -4,7 +4,7 @@ metadata:
   name: rag-mcp
   namespace: personal-infra
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: rag-mcp
