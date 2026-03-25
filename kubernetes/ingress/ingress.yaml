@@ -5,10 +5,10 @@ metadata:
   name: personal-infra-ingress
   namespace: personal-infra
   annotations:
-    kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/proxy-body-size: "1024m" # Equivalent to maxbodysize_proxy.conf
 spec:
+  ingressClassName: "nginx"
   tls:
   - hosts:
     - flix.arthos.dev.br

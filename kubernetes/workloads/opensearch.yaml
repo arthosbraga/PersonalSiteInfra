@@ -60,7 +60,8 @@ spec:
     app: opensearch
     node: node1
   ports:
-  - port: 9200
+  - name: http
+    port: 9200
     targetPort: 9200
   - name: transport
     port: 9300
@@ -129,7 +130,8 @@ spec:
     app: opensearch
     node: node2
   ports:
-  - port: 9200
+  - name: http
+    port: 9200
     targetPort: 9200
   - name: transport
     port: 9300
