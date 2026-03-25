@@ -10,20 +10,10 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install and Connect Cloudflare WARP (IPv6 Support)
-        run: |
-          curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
-          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
-          sudo apt-get update && sudo apt-get install -y cloudflare-warp
-          sudo warp-cli --accept-tos registration new
-          sudo warp-cli --accept-tos mode warp+doh
-          sudo warp-cli --accept-tos connect
-          sleep 3
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
@@ -31,27 +21,19 @@ jobs:
           version: "latest"
 
       - name: Configure Kubeconfig
+        shell: bash
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG }}
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
-          chmod 600 ~/.kube/config
+          # Salvando o config na pasta temporária do GitHub Runner
+          # ATENÇÃO: Se os certificados do secret estiverem vazios (como "") o kubectl não conectará.
+          echo "$KUBECONFIG_DATA" > "${RUNNER_TEMP}/kubeconfig"
+          echo "KUBECONFIG=${RUNNER_TEMP}/kubeconfig" >> $GITHUB_ENV
 
-          if [ ! -s ~/.kube/config ] || ! grep -q "apiVersion:" ~/.kube/config; then
-            echo "=========================================================================="
+          if [ ! -s "${RUNNER_TEMP}/kubeconfig" ] || ! grep -q "apiVersion:" "${RUNNER_TEMP}/kubeconfig"; then
             echo "ERRO FATAL: O Secret KUBECONFIG não foi encontrado ou está vazio."
-            echo "Você precisa ir nas configurações do repositório no GitHub:"
-            echo "Settings -> Secrets and variables -> Actions e criar o Secret KUBECONFIG."
-            echo "=========================================================================="
             exit 1
           fi
-          # Sobrescreve a URL do server no kubeconfig para acessar via VPN (porta nativa K8s: 42893)
-          # --minify garante que ele pegue apenas o cluster do contexto atual
-          CLUSTER_NAME=$(kubectl config view --minify -o jsonpath='{.clusters[0].name}')
-          if [ -z "$CLUSTER_NAME" ]; then
-            echo "Erro: O nome do cluster não foi encontrado. O secret KUBECONFIG está configurado corretamente?"
-            exit 1
-          fi
-          kubectl config set-cluster "$CLUSTER_NAME" --server=https://vpn.arthos.dev.br:42893 --insecure-skip-tls-verify=true
 
       - name: Deploy Manifests
         run: |
