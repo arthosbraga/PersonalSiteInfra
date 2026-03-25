@@ -4,7 +4,7 @@ metadata:
   name: rtmp-backstage
   namespace: personal-infra
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: rtmp-backstage
@@ -14,20 +14,20 @@ spec:
         app: rtmp-backstage
     spec:
       imagePullSecrets:
-      - name: ghcr-login-secret
+        - name: ghcr-login-secret
       containers:
-      - name: rtmp-backstage
-        image: ghcr.io/arthosbraga/rtmp-backstage:latest
-        ports:
-        - containerPort: 1935
-        - containerPort: 80
-        volumeMounts:
-        - name: data
-          mountPath: /data
+        - name: rtmp-backstage
+          image: ghcr.io/arthosbraga/rtmp-backstage:latest
+          ports:
+            - containerPort: 1935
+            - containerPort: 80
+          volumeMounts:
+            - name: data
+              mountPath: /data
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: rtmp-backstage-data-pvc
+        - name: data
+          persistentVolumeClaim:
+            claimName: rtmp-backstage-data-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -38,12 +38,12 @@ spec:
   selector:
     app: rtmp-backstage
   ports:
-  - name: rtmp
-    port: 1935
-    targetPort: 1935
-  - name: http
-    port: 80
-    targetPort: 80
+    - name: rtmp
+      port: 1935
+      targetPort: 1935
+    - name: http
+      port: 80
+      targetPort: 80
 
 ---
 apiVersion: apps/v1
@@ -52,7 +52,7 @@ metadata:
   name: backstage-ui
   namespace: personal-infra
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: backstage-ui
@@ -62,12 +62,12 @@ spec:
         app: backstage-ui
     spec:
       imagePullSecrets:
-      - name: ghcr-login-secret
+        - name: ghcr-login-secret
       containers:
-      - name: backstage-ui
-        image: ghcr.io/arthosbraga/backstage-ui:latest
-        ports:
-        - containerPort: 4200
+        - name: backstage-ui
+          image: ghcr.io/arthosbraga/backstage-ui:latest
+          ports:
+            - containerPort: 4200
 ---
 apiVersion: v1
 kind: Service
@@ -78,5 +78,5 @@ spec:
   selector:
     app: backstage-ui
   ports:
-  - port: 4200
-    targetPort: 4200
+    - port: 4200
+      targetPort: 4200

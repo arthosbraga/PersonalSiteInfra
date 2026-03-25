@@ -4,7 +4,7 @@ metadata:
   name: nextcloud
   namespace: personal-infra
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: nextcloud
@@ -14,48 +14,48 @@ spec:
         app: nextcloud
     spec:
       containers:
-      - name: nextcloud
-        image: nextcloud:latest
-        env:
-        - name: POSTGRES_HOST
-          value: nextcloud-db-svc
-        - name: POSTGRES_DB
-          value: nextcloud
-        - name: POSTGRES_USER
-          value: nextcloud
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: personal-infra-secrets
-              key: POSTGRES_PASSWORD
-        - name: PHP_UPLOAD_LIMIT
-          value: 1024G
-        - name: PHP_MEMORY_LIMIT
-          value: 2048M
-        ports:
-        - containerPort: 80
-        volumeMounts:
-        - name: html
-          mountPath: /var/www/html
-        - name: switch
-          mountPath: /mnt/Games/Switch
-        - name: cursos
-          mountPath: /mnt/Cursos
-        - name: livros
-          mountPath: /mnt/Livros
+        - name: nextcloud
+          image: nextcloud:latest
+          env:
+            - name: POSTGRES_HOST
+              value: nextcloud-db-svc
+            - name: POSTGRES_DB
+              value: nextcloud
+            - name: POSTGRES_USER
+              value: nextcloud
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: personal-infra-secrets
+                  key: POSTGRES_PASSWORD
+            - name: PHP_UPLOAD_LIMIT
+              value: 1024G
+            - name: PHP_MEMORY_LIMIT
+              value: 2048M
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /var/www/html
+            - name: switch
+              mountPath: /mnt/Games/Switch
+            - name: cursos
+              mountPath: /mnt/Cursos
+            - name: livros
+              mountPath: /mnt/Livros
       volumes:
-      - name: html
-        persistentVolumeClaim:
-          claimName: nextcloud-pvc
-      - name: switch
-        hostPath:
-          path: /c/games/Switch
-      - name: cursos
-        hostPath:
-          path: /f/Cursos
-      - name: livros
-        hostPath:
-          path: /f/Livros
+        - name: html
+          persistentVolumeClaim:
+            claimName: nextcloud-pvc
+        - name: switch
+          hostPath:
+            path: /c/games/Switch
+        - name: cursos
+          hostPath:
+            path: /f/Cursos
+        - name: livros
+          hostPath:
+            path: /f/Livros
 ---
 apiVersion: v1
 kind: Service
@@ -66,8 +66,8 @@ spec:
   selector:
     app: nextcloud
   ports:
-  - port: 80
-    targetPort: 80
+    - port: 80
+      targetPort: 80
 
 ---
 apiVersion: apps/v1
@@ -76,7 +76,7 @@ metadata:
   name: nextcloud-db
   namespace: personal-infra
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: nextcloud-db
@@ -86,27 +86,27 @@ spec:
         app: nextcloud-db
     spec:
       containers:
-      - name: postgres
-        image: postgres:latest
-        env:
-        - name: POSTGRES_DB
-          value: nextcloud
-        - name: POSTGRES_USER
-          value: nextcloud
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: personal-infra-secrets
-              key: POSTGRES_PASSWORD
-        ports:
-        - containerPort: 5432
-        volumeMounts:
-        - name: db-data
-          mountPath: /var/lib/postgresql/data
+        - name: postgres
+          image: postgres:latest
+          env:
+            - name: POSTGRES_DB
+              value: nextcloud
+            - name: POSTGRES_USER
+              value: nextcloud
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: personal-infra-secrets
+                  key: POSTGRES_PASSWORD
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql/data
       volumes:
-      - name: db-data
-        persistentVolumeClaim:
-          claimName: nextcloud-db-pvc
+        - name: db-data
+          persistentVolumeClaim:
+            claimName: nextcloud-db-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -117,5 +117,5 @@ spec:
   selector:
     app: nextcloud-db
   ports:
-  - port: 5432
-    targetPort: 5432
+    - port: 5432
+      targetPort: 5432
