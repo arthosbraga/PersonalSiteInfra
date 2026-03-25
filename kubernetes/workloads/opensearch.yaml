@@ -33,7 +33,10 @@ spec:
         - name: OPENSEARCH_JAVA_OPTS
           value: "-Xms4g -Xmx4g"
         - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
-          value: "YOUR_OPENSEARCH_PASSWORD_HERE"
+          valueFrom:
+            secretKeyRef:
+              name: personal-infra-secrets
+              key: OPENSEARCH_PASSWORD
         securityContext:
           privileged: true
         ports:
@@ -99,7 +102,10 @@ spec:
         - name: OPENSEARCH_JAVA_OPTS
           value: "-Xms4g -Xmx4g"
         - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
-          value: "YOUR_OPENSEARCH_PASSWORD_HERE"
+          valueFrom:
+            secretKeyRef:
+              name: personal-infra-secrets
+              key: OPENSEARCH_PASSWORD
         securityContext:
           privileged: true
         ports:

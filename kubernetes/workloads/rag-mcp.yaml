@@ -18,12 +18,15 @@ spec:
         image: ghcr.io/arthosbraga/rag-mcp:latest
         env:
         - name: HF_TOKEN
-          value: "YOUR_HUGGINGFACE_TOKEN_HERE"
+          valueFrom:
+            secretKeyRef:
+              name: personal-infra-secrets
+              key: HF_TOKEN
         ports:
         - containerPort: 8000
         resources:
           limits:
-            nvidia.com/gpu: 1
+            nvidia.com/gpu: "1"
         volumeMounts:
         - name: lancedb
           mountPath: /app/data/lancedb

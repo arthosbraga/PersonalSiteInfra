@@ -28,6 +28,17 @@ jobs:
       - name: Deploy Manifests
         run: |
           kubectl apply -f kubernetes/namespaces.yaml
+          
+          # Inject Secrets dynamically using GitHub Repository Secrets
+          kubectl create secret generic personal-infra-secrets \
+            --namespace personal-infra \
+            --from-literal=HF_TOKEN="${{ secrets.HF_TOKEN }}" \
+            --from-literal=CLOUDFLARE_API_TOKEN="${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            --from-literal=PIHOLE_WEBPASSWORD="${{ secrets.PIHOLE_WEBPASSWORD }}" \
+            --from-literal=POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
+            --from-literal=OPENSEARCH_PASSWORD="${{ secrets.OPENSEARCH_PASSWORD }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+            
           kubectl apply -f kubernetes/storage/
           kubectl apply -f kubernetes/workloads/
           kubectl apply -f kubernetes/ingress/

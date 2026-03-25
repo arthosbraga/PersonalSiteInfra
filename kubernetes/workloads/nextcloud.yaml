@@ -24,7 +24,10 @@ spec:
         - name: POSTGRES_USER
           value: nextcloud
         - name: POSTGRES_PASSWORD
-          value: "YOUR_PG_PASSWORD_HERE"
+          valueFrom:
+            secretKeyRef:
+              name: personal-infra-secrets
+              key: POSTGRES_PASSWORD
         - name: PHP_UPLOAD_LIMIT
           value: 1024G
         - name: PHP_MEMORY_LIMIT
@@ -91,7 +94,10 @@ spec:
         - name: POSTGRES_USER
           value: nextcloud
         - name: POSTGRES_PASSWORD
-          value: "YOUR_PG_PASSWORD_HERE"
+          valueFrom:
+            secretKeyRef:
+              name: personal-infra-secrets
+              key: POSTGRES_PASSWORD
         ports:
         - containerPort: 5432
         volumeMounts:

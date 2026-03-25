@@ -23,7 +23,10 @@ spec:
             drop: ["ALL"]
         env:
         - name: CLOUDFLARE_API_TOKEN
-          value: "YOUR_CLOUDFLARE_TOKEN_HERE"
+          valueFrom:
+            secretKeyRef:
+              name: personal-infra-secrets
+              key: CLOUDFLARE_API_TOKEN
         - name: DOMAINS
           value: "arthos.dev.br,flix.arthos.dev.br,search.arthos.dev.br,searchnode.arthos.dev.br,vpn.arthos.dev.br,dns.arthos.dev.br,drive.arthos.dev.br,vnc.arthos.dev.br,ragmcp.arthos.dev.br,backstage.arthos.dev.br,api-backstage.arthos.dev.br,stream.arthos.dev.br,priscilacatarino.com.br"
         - name: PROXIED

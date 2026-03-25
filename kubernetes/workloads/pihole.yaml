@@ -22,7 +22,10 @@ spec:
         - name: TZ
           value: "Europe/Lisbon"
         - name: WEBPASSWORD
-          value: "YOUR_PIHOLE_PASSWORD_HERE"
+          valueFrom:
+            secretKeyRef:
+              name: personal-infra-secrets
+              key: PIHOLE_WEBPASSWORD
         - name: IPv6
           value: "true"
         ports:
