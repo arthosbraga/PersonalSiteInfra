@@ -24,8 +24,8 @@ spec:
             - name: GIDLIST
               value: "100"
           ports:
-            - containerPort: 8096
-            - containerPort: 8920
+            - containerPort: 80
+            - containerPort: 443
           resources:
             limits:
               nvidia.com/gpu: "1"
@@ -76,5 +76,7 @@ spec:
   selector:
     app: emby
   ports:
-    - port: 8096
-      targetPort: 8096
+    - port: 80
+      targetPort: 80
+    - port: 443
+      targetPort: 443
