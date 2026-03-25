@@ -28,7 +28,7 @@ spec:
               service:
                 name: emby-svc
                 port:
-                  number: 80
+                  number: 8096
     - host: priscilacatarino.com.br
       http:
         paths:
