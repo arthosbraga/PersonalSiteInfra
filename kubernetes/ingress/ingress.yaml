@@ -5,7 +5,7 @@ metadata:
   name: personal-infra-ingress
   namespace: personal-infra
   annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/proxy-body-size: "1024m" # Equivalent to maxbodysize_proxy.conf
 spec:
   ingressClassName: "nginx"
