@@ -35,7 +35,7 @@ jobs:
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
-          
+
           if [ ! -s ~/.kube/config ] || ! grep -q "apiVersion:" ~/.kube/config; then
             echo "=========================================================================="
             echo "ERRO FATAL: O Secret KUBECONFIG não foi encontrado ou está vazio."
@@ -44,14 +44,14 @@ jobs:
             echo "=========================================================================="
             exit 1
           fi
-          # Sobrescreve a URL do server no kubeconfig para acessar via VPN (porta nativa K8s: 6443)
+          # Sobrescreve a URL do server no kubeconfig para acessar via VPN (porta nativa K8s: 42893)
           # --minify garante que ele pegue apenas o cluster do contexto atual
           CLUSTER_NAME=$(kubectl config view --minify -o jsonpath='{.clusters[0].name}')
           if [ -z "$CLUSTER_NAME" ]; then
             echo "Erro: O nome do cluster não foi encontrado. O secret KUBECONFIG está configurado corretamente?"
             exit 1
           fi
-          kubectl config set-cluster "$CLUSTER_NAME" --server=https://vpn.arthos.dev.br:6443 --insecure-skip-tls-verify=true
+          kubectl config set-cluster "$CLUSTER_NAME" --server=https://vpn.arthos.dev.br:42893 --insecure-skip-tls-verify=true
 
       - name: Deploy Manifests
         run: |
