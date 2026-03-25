@@ -42,6 +42,10 @@ jobs:
         shell: powershell
         run: |
           kubectl apply -f kubernetes/namespaces.yaml
+          
+          # Install cert-manager platform for SSL
+          kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.4/cert-manager.yaml
+          Start-Sleep -Seconds 30
 
           # Inject GHCR Pull Secret
           kubectl create secret docker-registry ghcr-login-secret `
