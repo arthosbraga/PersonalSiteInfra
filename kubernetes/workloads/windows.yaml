@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: windows
+  namespace: personal-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: windows
+  template:
+    metadata:
+      labels:
+        app: windows
+    spec:
+      containers:
+      - name: windows
+        image: dockurr/windows
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
+        env:
+        - name: RAM_SIZE
+          value: "16G"
+        - name: CPU_CORES
+          value: "24"
+        - name: DISK_SIZE
+          value: "100G"
+        - name: GPU
+          value: "Y"
+        - name: VERSION
+          value: "2025"
+        ports:
+        - containerPort: 8006
+        - containerPort: 3389
+          name: rdp-tcp
+        - containerPort: 3389
+          protocol: UDP
+          name: rdp-udp
+        - containerPort: 8180
+        - containerPort: 8080
+        - containerPort: 7197
+        - containerPort: 57564
+        - containerPort: 5601
+        - containerPort: 9200
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: dev
+          mountPath: /dev/kvm
+        - name: storage
+          mountPath: /storage
+      volumes:
+      - name: dev
+        hostPath:
+          path: /dev/kvm
+      - name: storage
+        hostPath:
+          path: /c/DEV/arthos.dev.br
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: windows-svc
+  namespace: personal-infra
+spec:
+  selector:
+    app: windows
+  ports:
+  - name: vnc
+    port: 8006
+    targetPort: 8006
+  - name: rdp-tcp
+    port: 3389
+    targetPort: 3389
+  - name: rdp-udp
+    port: 3389
+    protocol: UDP
+    targetPort: 3389
+  - name: p8180
+    port: 8180
+    targetPort: 8180
+  - name: p8080
+    port: 8080
+    targetPort: 8080
+  - name: p7197
+    port: 7197
+    targetPort: 7197
+  - name: p57564
+    port: 57564
+    targetPort: 57564
+  - name: p5601
+    port: 5601
+    targetPort: 5601
+  - name: p9200
+    port: 9200
+    targetPort: 9200

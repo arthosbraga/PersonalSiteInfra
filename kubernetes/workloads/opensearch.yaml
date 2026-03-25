@@ -1,0 +1,173 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opensearch-node1
+  namespace: personal-infra
+spec:
+  serviceName: opensearch-node1-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opensearch
+      node: node1
+  template:
+    metadata:
+      labels:
+        app: opensearch
+        node: node1
+    spec:
+      containers:
+      - name: opensearch
+        image: opensearchproject/opensearch:latest
+        env:
+        - name: cluster.name
+          value: opensearch-cluster
+        - name: node.name
+          value: opensearch-node1
+        - name: discovery.seed_hosts
+          value: opensearch-node1-svc,opensearch-node2-svc
+        - name: cluster.initial_cluster_manager_nodes
+          value: opensearch-node1,opensearch-node2
+        - name: bootstrap.memory_lock
+          value: "true"
+        - name: OPENSEARCH_JAVA_OPTS
+          value: "-Xms4g -Xmx4g"
+        - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
+          value: "YOUR_OPENSEARCH_PASSWORD_HERE"
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 9200
+        - containerPort: 9300
+        volumeMounts:
+        - name: data
+          mountPath: /usr/share/opensearch/data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: opensearch-data1-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-node1-svc
+  namespace: personal-infra
+spec:
+  selector:
+    app: opensearch
+    node: node1
+  ports:
+  - port: 9200
+    targetPort: 9200
+  - name: transport
+    port: 9300
+    targetPort: 9300
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opensearch-node2
+  namespace: personal-infra
+spec:
+  serviceName: opensearch-node2-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opensearch
+      node: node2
+  template:
+    metadata:
+      labels:
+        app: opensearch
+        node: node2
+    spec:
+      containers:
+      - name: opensearch
+        image: opensearchproject/opensearch:latest
+        env:
+        - name: cluster.name
+          value: opensearch-cluster
+        - name: node.name
+          value: opensearch-node2
+        - name: discovery.seed_hosts
+          value: opensearch-node1-svc,opensearch-node2-svc
+        - name: cluster.initial_cluster_manager_nodes
+          value: opensearch-node1,opensearch-node2
+        - name: bootstrap.memory_lock
+          value: "true"
+        - name: OPENSEARCH_JAVA_OPTS
+          value: "-Xms4g -Xmx4g"
+        - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
+          value: "YOUR_OPENSEARCH_PASSWORD_HERE"
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 9200
+        - containerPort: 9300
+        volumeMounts:
+        - name: data
+          mountPath: /usr/share/opensearch/data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: opensearch-data2-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-node2-svc
+  namespace: personal-infra
+spec:
+  selector:
+    app: opensearch
+    node: node2
+  ports:
+  - port: 9200
+    targetPort: 9200
+  - name: transport
+    port: 9300
+    targetPort: 9300
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch-dashboards
+  namespace: personal-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opensearch-dashboards
+  template:
+    metadata:
+      labels:
+        app: opensearch-dashboards
+    spec:
+      containers:
+      - name: dashboards
+        image: opensearchproject/opensearch-dashboards:latest
+        env:
+        - name: OPENSEARCH_HOSTS
+          value: "[\"https://opensearch-node1-svc:9200\",\"https://opensearch-node2-svc:9200\"]"
+        - name: data_source.enabled
+          value: "true"
+        - name: workspace.enabled
+          value: "true"
+        - name: explore.enabled
+          value: "true"
+        ports:
+        - containerPort: 5601
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-dashboards-svc
+  namespace: personal-infra
+spec:
+  selector:
+    app: opensearch-dashboards
+  ports:
+  - port: 5601
+    targetPort: 5601

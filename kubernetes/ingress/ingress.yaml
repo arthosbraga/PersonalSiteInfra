@@ -1,0 +1,137 @@
+# Base Ingress setup using nginx-ingress API and cert-manager for TLS
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: personal-infra-ingress
+  namespace: personal-infra
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: "1024m" # Equivalent to maxbodysize_proxy.conf
+spec:
+  tls:
+  - hosts:
+    - flix.arthos.dev.br
+    - priscilacatarino.com.br
+    - arthos.dev.br
+    - drive.arthos.dev.br
+    - searchnode.arthos.dev.br
+    - search.arthos.dev.br
+    - vnc.arthos.dev.br
+    - ragmcp.arthos.dev.br
+    - api-backstage.arthos.dev.br
+    - stream.arthos.dev.br
+    - backstage.arthos.dev.br
+    secretName: personal-infra-tls
+  rules:
+  # Route definitions will point to their respective services
+  - host: flix.arthos.dev.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: emby-svc
+            port:
+              number: 8096
+  - host: priscilacatarino.com.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: priscilacatarinopsi-svc
+            port:
+              number: 80
+  - host: arthos.dev.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pihole-svc
+            port:
+              number: 80
+  - host: drive.arthos.dev.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nextcloud-svc
+            port:
+              number: 80
+  - host: searchnode.arthos.dev.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: opensearch-node1-svc
+            port:
+              number: 9200
+  - host: search.arthos.dev.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: opensearch-dashboards-svc
+            port:
+              number: 5601
+  - host: vnc.arthos.dev.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: windows-svc
+            port:
+              number: 8006
+  - host: ragmcp.arthos.dev.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rag-mcp-svc
+            port:
+              number: 8000
+  - host: backstage.arthos.dev.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: backstage-ui-svc
+            port:
+              number: 4200
+  - host: api-backstage.arthos.dev.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rtmp-backstage-svc
+            port:
+              number: 80
+  - host: stream.arthos.dev.br
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rtmp-backstage-svc
+            port:
+              number: 80

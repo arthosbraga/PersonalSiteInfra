@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rtmp-backstage
+  namespace: personal-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rtmp-backstage
+  template:
+    metadata:
+      labels:
+        app: rtmp-backstage
+    spec:
+      containers:
+      - name: rtmp-backstage
+        image: ghcr.io/arthosbraga/rtmp-backstage:latest
+        ports:
+        - containerPort: 1935
+        - containerPort: 80
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: rtmp-backstage-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rtmp-backstage-svc
+  namespace: personal-infra
+spec:
+  selector:
+    app: rtmp-backstage
+  ports:
+  - name: rtmp
+    port: 1935
+    targetPort: 1935
+  - name: http
+    port: 80
+    targetPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backstage-ui
+  namespace: personal-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backstage-ui
+  template:
+    metadata:
+      labels:
+        app: backstage-ui
+    spec:
+      containers:
+      - name: backstage-ui
+        image: ghcr.io/arthosbraga/backstage-ui:latest
+        ports:
+        - containerPort: 4200
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backstage-ui-svc
+  namespace: personal-infra
+spec:
+  selector:
+    app: backstage-ui
+  ports:
+  - port: 4200
+    targetPort: 4200

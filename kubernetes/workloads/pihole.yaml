@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole
+  namespace: personal-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: pihole
+    spec:
+      containers:
+      - name: pihole
+        image: pihole/pihole:latest
+        env:
+        - name: TZ
+          value: "Europe/Lisbon"
+        - name: WEBPASSWORD
+          value: "YOUR_PIHOLE_PASSWORD_HERE"
+        - name: IPv6
+          value: "true"
+        ports:
+        - containerPort: 53
+          name: dns-tcp
+          protocol: TCP
+        - containerPort: 53
+          name: dns-udp
+          protocol: UDP
+        - containerPort: 67
+          name: dhcp
+          protocol: UDP
+        - containerPort: 80
+          name: web
+          protocol: TCP
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
+        volumeMounts:
+        - name: etc-pihole
+          mountPath: /etc/pihole
+        - name: etc-dnsmasq
+          mountPath: /etc/dnsmasq.d
+      volumes:
+      - name: etc-pihole
+        persistentVolumeClaim:
+          claimName: pihole-etc-pvc
+      - name: etc-dnsmasq
+        persistentVolumeClaim:
+          claimName: pihole-dnsmasq-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-svc
+  namespace: personal-infra
+spec:
+  selector:
+    app: pihole
+  ports:
+  - name: web
+    port: 80
+    targetPort: 80
+  - name: dns-tcp
+    port: 53
+    targetPort: 53
+  - name: dns-udp
+    port: 53
+    protocol: UDP
+    targetPort: 53
+  - name: dhcp
+    port: 67
+    protocol: UDP
+    targetPort: 67

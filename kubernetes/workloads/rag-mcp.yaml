@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-mcp
+  namespace: personal-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rag-mcp
+  template:
+    metadata:
+      labels:
+        app: rag-mcp
+    spec:
+      containers:
+      - name: rag-mcp
+        image: ghcr.io/arthosbraga/rag-mcp:latest
+        env:
+        - name: HF_TOKEN
+          value: "YOUR_HUGGINGFACE_TOKEN_HERE"
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: lancedb
+          mountPath: /app/data/lancedb
+        - name: models
+          mountPath: /app/data/models
+        - name: kpmg
+          mountPath: /app/projects
+      volumes:
+      - name: lancedb
+        persistentVolumeClaim:
+          claimName: rag-mcp-lancedb-pvc
+      - name: models
+        persistentVolumeClaim:
+          claimName: rag-mcp-models-pvc
+      - name: kpmg
+        hostPath:
+          path: /c/DEV/KPMG
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-mcp-svc
+  namespace: personal-infra
+spec:
+  selector:
+    app: rag-mcp
+  ports:
+  - port: 8000
+    targetPort: 8000

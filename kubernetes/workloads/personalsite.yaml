@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: personalsite-front
+  namespace: personal-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: personalsite-front
+  template:
+    metadata:
+      labels:
+        app: personalsite-front
+    spec:
+      containers:
+      - name: frontend
+        image: ghcr.io/arthosbraga/personalsite-front:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: personalsite-front-svc
+  namespace: personal-infra
+spec:
+  selector:
+    app: personalsite-front
+  ports:
+  - port: 80
+    targetPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: personalsite-back
+  namespace: personal-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: personalsite-back
+  template:
+    metadata:
+      labels:
+        app: personalsite-back
+    spec:
+      containers:
+      - name: backend
+        image: ghcr.io/arthosbraga/personalsite-back:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: personalsite-back-svc
+  namespace: personal-infra
+spec:
+  selector:
+    app: personalsite-back
+  ports:
+  - port: 8080
+    targetPort: 8080

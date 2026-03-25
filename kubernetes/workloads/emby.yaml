@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emby
+  namespace: personal-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emby
+  template:
+    metadata:
+      labels:
+        app: emby
+    spec:
+      containers:
+      - name: emby
+        image: emby/embyserver:latest
+        env:
+        - name: UID
+          value: "1000"
+        - name: GID
+          value: "100"
+        - name: GIDLIST
+          value: "100"
+        ports:
+        - containerPort: 8096
+        - containerPort: 8920
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: programdata
+          mountPath: /config
+        - name: data
+          mountPath: /data
+        - name: animes
+          mountPath: /mnt/Animes
+        - name: filmes2
+          mountPath: /mnt/Filmes2
+        - name: series2
+          mountPath: /mnt/Series2
+        - name: filmes
+          mountPath: /mnt/Filmes
+        - name: series
+          mountPath: /mnt/Series
+      volumes:
+      - name: programdata
+        hostPath:
+          path: /c/DEV/arthos.dev.br/Emby/programdata
+      - name: data
+        hostPath:
+          path: /c/DEV/arthos.dev.br/Emby/data
+      - name: animes
+        hostPath:
+          path: /e/Animes
+      - name: filmes2
+        hostPath:
+          path: /e/Filmes
+      - name: series2
+        hostPath:
+          path: /e/Series
+      - name: filmes
+        hostPath:
+          path: /f/Filmes
+      - name: series
+        hostPath:
+          path: /f/Series
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emby-svc
+  namespace: personal-infra
+spec:
+  selector:
+    app: emby
+  ports:
+  - port: 8096
+    targetPort: 8096

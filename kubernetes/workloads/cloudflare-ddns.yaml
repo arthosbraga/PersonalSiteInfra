@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflare-ddns
+  namespace: personal-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflare-ddns
+  template:
+    metadata:
+      labels:
+        app: cloudflare-ddns
+    spec:
+      hostNetwork: true
+      containers:
+      - name: ddns
+        image: favonia/cloudflare-ddns:latest
+        securityContext:
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+        env:
+        - name: CLOUDFLARE_API_TOKEN
+          value: "YOUR_CLOUDFLARE_TOKEN_HERE"
+        - name: DOMAINS
+          value: "arthos.dev.br,flix.arthos.dev.br,search.arthos.dev.br,searchnode.arthos.dev.br,vpn.arthos.dev.br,dns.arthos.dev.br,drive.arthos.dev.br,vnc.arthos.dev.br,ragmcp.arthos.dev.br,backstage.arthos.dev.br,api-backstage.arthos.dev.br,stream.arthos.dev.br,priscilacatarino.com.br"
+        - name: PROXIED
+          value: "true"
+        - name: IP4_PROVIDER
+          value: "none"
