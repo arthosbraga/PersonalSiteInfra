@@ -24,6 +24,10 @@ jobs:
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
+          
+          # Sobrescreve a URL do server no kubeconfig para acessar via VPN (porta nativa K8s: 6443)
+          CLUSTER_NAME=$(kubectl config view -o jsonpath='{.clusters[0].name}')
+          kubectl config set-cluster $CLUSTER_NAME --server=https://vpn.arthos.dev.br:6443 --insecure-skip-tls-verify=true
 
       - name: Deploy Manifests
         run: |
