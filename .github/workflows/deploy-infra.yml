@@ -15,6 +15,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup WARP (IPv6 Support)
+        uses: fscarmen/warp-on-actions@v1.0
+
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
@@ -41,7 +44,7 @@ jobs:
             echo "Erro: O nome do cluster não foi encontrado. O secret KUBECONFIG está configurado corretamente?"
             exit 1
           fi
-          kubectl config set-cluster "$CLUSTER_NAME" --server=http://vpn.arthos.dev.br:6443 --insecure-skip-tls-verify=true
+          kubectl config set-cluster "$CLUSTER_NAME" --server=https://vpn.arthos.dev.br:6443 --insecure-skip-tls-verify=true
 
       - name: Deploy Manifests
         run: |
